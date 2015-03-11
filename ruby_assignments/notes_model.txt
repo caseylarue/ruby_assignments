@@ -1,0 +1,146 @@
+NEW RAILS PROJECT
+bash	rails new sample_app
+bash	rais console	(cd into where new project was made)
+bash	rails s(erver)  (cd into where new project was made)
+
+ADD GEMS
+sublime	gemfile > add gem "hirb"
+bash(app_directory)	run bundle install
+
+CREATE MODEL
+(1)
+* model names are uppercase and singular
+bash(app_directory)		
+rails g model User first_name:string last_name:string email:string password:string age:integer
+
+(2)
+check the new migration file in db > migrate
+
+(3)  Run the migration
+bash(app_directory)		>>rake db:migrate
+ # creates the schema.rb file
+
+(4) verify (confirm migration ran successfully) 
+sublime 	db>schema.rb    list of tables in your db
+
+
+
+
+CREATE A NEW RECORD
+rails_c		user1 = User.new
+rails_c		user1[:first_name] = "Casey"
+rails_c		user1[:last_name] = "LaRue"
+rails_c		user1   #what was inputted?
+rails_c		user1.save
+rails_c		user2 = User.new(first_name:"Cerci", last_name:"Lannister", age:35)
+
+VALIDATE NEW RECORD
+.save, .valid?, .new_record?
+
+SAVE A NEW RECORD
+rails_c		user2.save
+rails_c		User.create(first_name:"Jon", last_name:"Show", age:17)  		## combines new and save
+
+rails_c		Hirb.enable
+rails_c		user.all, user.first, user.last, user.find(4), user.find_by(first_name:"John")
+
+
+rails_c		user.last.update(age:18)
+rails_c		user.find(3).update(first_name:"Casey", last_name:"LaRue")
+
+VALIDATIONS
+sublime		app>models>user.rb  # see platform for examples
+
+TEST VALIDATION
+rails_c		reload!
+rails_c		jon = User.new
+rails_c		jon.valid?  (true => good to save)
+rails_c		jon.save
+rails_c		jon.errors
+rails_c		jon.errors.full_messages
+
+CREATE NEW MODEL (relationships)
+rails g model Product name:string price:float description:text user:references
+
+sbl 		db>migrate folder  >> to verify
+rails_c		rake db:migrate
+sublime 	db>schema.rb  || models>product.rb || users.rb
+				>> model>product.rb  belongs_to :user
+						has_many :ninjas, :dependent => :destroy
+				>> model>user.rb  has_many :products
+
+ADD PRODUCTS TO DB
+rails_c		User.first.products.new 
+
+rails_c		user.first.products.create(name:"iPad", price:199, description:"Used")
+rails_c		User.last.update(age:18)
+
+ADD TO TABLE
+rails_c		user.last.products.create(name:"", price:199, description:"")
+
+Dojo.find(2).ninjas.create(first_name:"Richard", last_name:"Wang")
+
+Dojo.find_by(city:"Seattle").ninjas.create(first_name:"Cool", last_name:"Gal")
+
+SEE PRODUCTS
+rails_c		User.first.products
+rails_c		Product.all
+rails_c		User.last.products
+rails_c		Product.first.user.first_name
+rails_c		User.find(4).messages.find(5)
+
+RAILS MIGRATIONS
+- to add 	column to products table
+bash		rails generate migration AddCategoryToProducts
+sublime		db>migrate>new file
+				class AddCategoryToProducts
+					def change
+						add_column :products, :category, :string    
+						####=====>> creates empty column in all entries
+					end
+sublime		db>schema.rb    #we added category 
+rails_c		product.alls
+
+QUERIES
+http://edgeguides.rubyonrails.org/active_record_querying.html
+
+User.all
+User.first
+User.last
+
+UPDATE RECORD
+User.find_by(first_name:"Casey")
+customer1 = User.find_by(first_name:"Casey")
+customer1.email = "casey@awesome.com"
+customer1.save
+ >> verify saved correctly
+ User.find_by(first_name:"Casey")
+
+arya = User.find(3)
+arya.last_name = "Change"
+arya.save
+
+Ninja.where(:dojo_id =>[2]).update_all(:dojo_id=>[5])
+
+DELETE RECORD
+http://guides.rubyonrails.org/active_record_basics.html
+user = User.find_by(name: 'David')
+user.destroy
+User.all >> to verify
+
+SORT BY FIRST NAME
+http://guides.rubyonrails.org/active_record_querying.html#ordering
+User.order(:first_name)
+DESTROY MODEL
+bundle exec rake db:rollback    
+rails destroy model <model_name>
+
+ SELECT "ninjas"."first_name" FROM "ninjas" WHERE (dojo_id = 4)  ORDER BY "ninjas"."created_at" DESC
+
+
+
+
+
+
+
+
