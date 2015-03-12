@@ -131,11 +131,13 @@ User.all >> to verify
 SORT BY FIRST NAME
 http://guides.rubyonrails.org/active_record_querying.html#ordering
 User.order(:first_name)
+
 DESTROY MODEL
 bundle exec rake db:rollback    
 rails destroy model <model_name>
 
- SELECT "ninjas"."first_name" FROM "ninjas" WHERE (dojo_id = 4)  ORDER BY "ninjas"."created_at" DESC
+
+ Ninja.where(["dojo_id = ?", 4]).select(:first_name).order(created_at: :desc)
 
 
 

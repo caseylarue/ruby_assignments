@@ -1,0 +1,147 @@
+NEW RAILS PROJECT
+bash	rails new sample_app
+bash	rais console	(cd into where new project was made)
+bash	rails s(erver)  (cd into where new project was made)
+
+
+ADD GEMS
+sublime	gemfile > add gem "hirb"
+bash(app_directory)	run bundle install
+restart rails console
+
+CREATE MODELS in bash(app_directory)
+(1) rails g model Blog name:string description:string
+
+(2) check the new migration file in db > migrate
+
+(3)  Run the migration
+bash(app_directory)		>>rake db:migrate
+ # creates the schema.rb file
+
+(4) verify (confirm migration ran successfully) 
+sublime 	db>schema.rb    list of tables in your db
+
+
+CREATE ASSOCIATED MODELS
+(1)rails g model Post title:string content:text blog:references
+
+sbl 		db>migrate folder  >> to verify
+rails_c		rake db:migrate
+sublime 	db>schema.rb  || models>product.rb || users.rb
+			>> model>product.rb  belongs_to :user
+			>> model>user.rb  has_many :products, :dependent => :destroy
+
+(2)rails g model Message author:string message:text post:references 
+
+sbl 		db>migrate folder  >> to verify
+rails_c		rake db:migrate
+sublime 	db>schema.rb  || models>product.rb || users.rb
+	>> model>post.rb  has_many :messages,:dependent => :destroy
+	>> model>message.rb  belongs_to :post
+
+
+VALIDATIONS TO MODEL
+Blog
+(1)require the presence of name and description for the blog
+  in app>model> validates :name, :description, presence: true
+
+Post
+(2)require the presence of title and content for the posts, require the title to be at least 7 characters long
+	in app>model> 
+	validates :title, :content, presence: true
+	validates :title, length: { minimum: 7 }	
+
+Messages
+(3)require author and message for the messages. Require the message to be at least 15 characters long.
+
+
+QUERIES:
+(a) before I run queries I need to verify that my validations are correct
+	blog1 = Blog.new()
+	blog1.valid?
+	blog1.errors.full_messages
+	 => ["Name can't be blank", "Description can't be blank"] 
+
+create 5 blogs
+1) blog1 = Blog.new(name:"AnyHuman", description:"intelligence to thrive")
+	blog1.save
+	Hirb.enable
+	Blog.all
+
+	blog5 = Blog.new(name:"Ruby on Rails", description:"excellent MVC")
+
+2) create several posts for each blog
+(a) validate 
+post1 = Post.new()
+post1.valid?
+post1.errors.full_messages
+
+Blog.find(1).posts.create(title:"ways to win", content:"alkjdflkadjflkj")
+Blog.find(1).posts.create(title:"Post 1234567", content:"alkjdflkadjflkj")
+Blog.find(2).posts.create(title:"another post!", content:"alkjdflkadjflkj")
+Blog.find(2).posts.create(title:"what is up!!!", content:"alkjdflkadjflkj")
+Blog.find(3).posts.create(title:"what is up!!!", content:"alkjdflkadjflkj")
+Blog.find(3).posts.create(title:"what is up!!!", content:"alkjdflkadjflkj")
+Blog.find(4).posts.create(title:"Post 1234567", content:"alkjdflkadjflkj")
+Blog.find(4).posts.create(title:"Post 1234567", content:"alkjdflkadjflkj")
+Blog.find(5).posts.create(title:"Topic topic topic", content:"alkjdflkadjflkj")
+Blog.find(5).posts.create(title:"Topic topic topic", content:"alkjdflkadjflkj")
+
+verify  >> Post.all
+	
+3) create several messages for the first post
+(a) validate 
+msg1 = Message.new()
+msg1.valid?
+msg1.errors.full_messages
+
+Post.find(1).messages.create(author:"Casey", message:"Hi this is Casey.  How are you?")
+
+
+4) retreive all posts from the first blog
+
+Post.where(["blog_id = ?", 1]).select(:title, :content).order(created_at: :desc)
+
+Post.where("blog_id = 1").select(:title, :content).order(created_at: :desc)
+
+
+5)  know how to retrieve all posts for the last blog (sorted by title in the DESC order)
+
+Blog.last.posts.order(created_at: :desc)
+
+Blog.last.posts.select(:title, :content).order(created_at: :desc)
+
+
+6)  know how to update the first post's title
+
+Post.find_by(id:1).update(title:"this is us changing the title")
+
+
+7) know how to delete the third post (have the model automatically delete all messages associated with the third post when you delete the third post)
+
+creating messages to later delete:
+Post.find(3).messages.create(author:"Casey", message:"Hi this is Casey.  How are you?")
+
+post3 = Post.find_by(id: 3)
+post3.destroy
+Post.all >> to verify
+Message.all
+
+9) retrieve all blogs whose id is less than 5
+
+Blog.where(id < 5)
+
+
+10)  think of other potential information you may need for this application and get comfortable being able to pull information using the console
+
+
+- delete blogs   
+Blog.find_by(id: 1).destroy
+
+- update messages
+msg1 = Message.find_by(id: 2)
+msg1.title = "I am changing the title of this post!"
+msg1.save
+
+- update blogs
+
