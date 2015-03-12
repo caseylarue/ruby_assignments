@@ -1,0 +1,47 @@
+NEW RAILS PROJECT
+bash	rails new sample_app
+bash	rais console	(cd into where new project was made)
+bash	rails s(erver)  (cd into where new project was made)
+
+
+ADD GEMS
+sublime	gemfile > add gem "hirb"
+bash(app_directory)	run bundle install
+restart rails console
+Hirb.enable
+
+CREATE MODELS in bash(app_directory)
+Users
+	rails g model Users first_name:string last_name:string
+		- check the new migration file in db > migrate
+		- Run the migration in bash(app_directory)		
+			>>rake db:migrate # creates the schema.rb file
+		- verify (confirm migration ran successfully) 
+			sublime 	db>schema.rb    list of tables in your db
+
+Friendships
+	rails g model Friendships friend_id:integer user:references
+		- check the new migration file in db > migrate
+		- Run the migration in bash(app_directory)		
+			>>rake db:migrate # creates the schema.rb file
+		- verify (confirm migration ran successfully) 
+			sublime 	db>schema.rb    list of tables in your db
+
+Model Adjustments	
+x	>> user.rb  has_many :friendships
+				has_many :friends, :through => :friendships
+				has_many :inverse_friendships, :class_name => "Friendship", :foreign_key => "friend_id"
+				has_many :inverse_friends, :through => :inverse_friendships, :source => :user
+
+x	>> friendships.rb  belongs_to :user
+						belongs_to :friend, :class_name => "User"
+
+Queries
+
+
+
+1) User.first should retrieve the first user information
+
+2) User.first.friends should display all the friend information of the first user (this should include the first name and last name of all the friends of User.first).
+
+4) Find out how you can retrieve all users who is NOT a friend with the first User.
